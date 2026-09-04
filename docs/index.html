@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order Case Management Backend — a governed Xano order operations backend</title>
+    <meta
+      name="description"
+      content="A Xano backend where every order is a case in an enforced state machine, with API-layer RBAC, a stock-allocation guard, and an audit trail on every transition."
+    />
+    <style>
+      :root {
+        --bg: #0a0a0b;
+        --panel: #141416;
+        --panel-2: #1b1b1e;
+        --text: #ededed;
+        --muted: #a1a1aa;
+        --border: #2a2a2e;
+        --accent: #10b981;
+        --accent-fg: #04120c;
+        --danger: #f87171;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: radial-gradient(1200px 600px at 50% -10%, #14201b 0%, var(--bg) 55%);
+        color: var(--text);
+        font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      }
+      a { color: inherit; }
+      .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+      header.top { padding: 20px 0; }
+      .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.01em; }
+      .brand .dot { width: 12px; height: 12px; border-radius: 4px; background: var(--accent); }
+      .hero { text-align: center; padding: 40px 0 8px; }
+      .hero h1 { font-size: 2.5rem; line-height: 1.1; letter-spacing: -0.02em; margin: 14px 0 10px; }
+      .hero p.lede { color: var(--muted); font-size: 1.15rem; max-width: 640px; margin: 0 auto; }
+      .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 18px 0 6px; }
+      .badge {
+        font-size: 0.8rem; padding: 4px 10px; border-radius: 999px;
+        border: 1px solid var(--border); color: var(--muted); background: var(--panel);
+      }
+      .badge.accent { color: var(--accent); border-color: rgba(16, 185, 129, 0.4); }
+      .meta { color: var(--muted); font-size: 0.95rem; margin: 12px 0 0; font-variant-numeric: tabular-nums; }
+      .hero-actions { display: flex; gap: 12px; justify-content: center; margin: 26px 0 8px; flex-wrap: wrap; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 10px;
+        font-weight: 600; text-decoration: none; font-size: 0.98rem; transition: all 0.15s ease; border: 1px solid transparent;
+      }
+      .btn.primary { background: var(--accent); color: var(--accent-fg); }
+      .btn.primary:hover { filter: brightness(1.08); }
+      .btn.ghost { border-color: var(--border); color: var(--text); background: transparent; }
+      .btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+      .shot { margin: 40px 0 8px; }
+      .shot img {
+        width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--border);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5); display: block;
+      }
+      .shot .cap { text-align: center; color: var(--muted); font-size: 0.85rem; margin-top: 10px; }
+      section { padding: 34px 0; border-top: 1px solid var(--border); margin-top: 34px; }
+      h2 { font-size: 1.5rem; letter-spacing: -0.01em; margin: 0 0 18px; }
+      .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+      .card { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+      .card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+      .card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+      table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+      th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+      th { color: var(--muted); font-weight: 600; }
+      td code, .verb { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.86rem; }
+      .verb { color: var(--accent); font-weight: 700; }
+      pre {
+        background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px;
+        padding: 16px; overflow-x: auto; font-size: 0.86rem; color: #d4d4d8;
+      }
+      .note { color: var(--muted); font-size: 0.9rem; background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+      footer { padding: 40px 0 60px; color: var(--muted); font-size: 0.85rem; text-align: center; border-top: 1px solid var(--border); margin-top: 34px; }
+      .list { margin: 0; padding-left: 18px; color: var(--muted); }
+      .list li { margin: 8px 0; }
+      .list strong { color: var(--text); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <div class="brand"><span class="dot"></span> Order Case Management</div>
+      </header>
+
+      <div class="hero">
+        <div class="badges">
+          <span class="badge accent">Play 2 · Backend Modernization</span>
+          <span class="badge">Order operations</span>
+          <span class="badge">Native RBAC</span>
+        </div>
+        <h1>A governed order operations backend</h1>
+        <p class="lede">
+          Every order is a case that moves through an enforced state machine. Role checks at the API
+          layer decide who can advance or hold it, and every transition is written to an audit trail
+          with the actor and the reason.
+        </p>
+        <p class="meta">7 tables · 11 endpoints · 3 API groups</p>
+        <div class="hero-actions">
+          <a class="btn primary" href="https://github.com/xano-scratch/order-case-management-backend">View on GitHub</a>
+          <a class="btn ghost" href="#use">Use this template</a>
+        </div>
+      </div>
+
+      <div class="shot">
+        <img src="screenshot.png" alt="Order detail on exception hold: the rule that fired, the short line item, the role-gated actions, and the full audit trail" />
+        <div class="cap">An order held on the insufficient-stock exception, with the reason, the short line, and the audit trail.</div>
+      </div>
+
+      <section>
+        <h2>What it demonstrates</h2>
+        <ul class="list">
+          <li><strong>An enforced state machine.</strong> received, validated, allocated, fulfilled, plus an exception hold and a cancel. Illegal jumps are blocked with a clear status and message.</li>
+          <li><strong>Native RBAC at the API layer.</strong> Three roles (ops agent, supervisor, viewer). Each endpoint reads the caller and checks the role in a precondition. This is middleware and role checks, not row-level security.</li>
+          <li><strong>A stock-allocation guard.</strong> Allocating checks inventory line by line. It reserves and decrements when stock covers the order, or holds it on exception with the reason when a line is short.</li>
+          <li><strong>An append-only audit trail.</strong> Every transition writes one row with who acted and why, so the history of a case reads back in order.</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>API surface</h2>
+        <table>
+          <thead>
+            <tr><th>Endpoint</th><th>What it enforces</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="verb">POST</span> <code>/api:auth/login</code></td><td>Mints a token. Same 401 on a bad email or a bad password.</td></tr>
+            <tr><td><span class="verb">POST</span> <code>/api:orders/create</code></td><td>Ops or supervisor only. Requires a real customer. Totals the lines on the server.</td></tr>
+            <tr><td><span class="verb">POST</span> <code>/api:orders/validate</code></td><td>received to validated. Needs at least one line item.</td></tr>
+            <tr><td><span class="verb">POST</span> <code>/api:orders/allocate</code></td><td>validated to allocated. Reserves and decrements stock, or holds on exception.</td></tr>
+            <tr><td><span class="verb">POST</span> <code>/api:orders/fulfill</code></td><td>allocated to fulfilled.</td></tr>
+            <tr><td><span class="verb">POST</span> <code>/api:orders/exception</code></td><td>Puts an active order on exception hold with a reason.</td></tr>
+            <tr><td><span class="verb">POST</span> <code>/api:orders/resolve</code></td><td>Supervisor only. Returns the order to its pre-exception state.</td></tr>
+            <tr><td><span class="verb">POST</span> <code>/api:orders/cancel</code></td><td>Supervisor only. Cancels an open order.</td></tr>
+            <tr><td><span class="verb">GET</span> <code>/api:orders/list</code></td><td>Any signed-in role. Orders, customers, and stock on hand.</td></tr>
+            <tr><td><span class="verb">GET</span> <code>/api:orders/get/{order_id}</code></td><td>Any signed-in role. One order with lines, allocations, timeline, and stock.</td></tr>
+            <tr><td><span class="verb">POST</span> <code>/api:seed/run</code></td><td>Public. Resets the demo data.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section>
+        <h2>Frontend screens</h2>
+        <div class="grid">
+          <div class="card"><h3>Sign in</h3><p>One account per role, with a quick sign-in chip for each, so you can feel the role gates.</p></div>
+          <div class="card"><h3>Orders board</h3><p>Status badges, customers, totals, and a stock-on-hand panel. Ops and supervisors can open a new order.</p></div>
+          <div class="card"><h3>Order detail</h3><p>The state rail, role-gated actions, the exception banner with a Resolve action, line items against stock, and the audit trail.</p></div>
+        </div>
+        <p class="note" style="margin-top:16px">The action buttons show for the current state. A lock marks one your role cannot run, and clicking it returns the real 403 from the API, so you can see the check is server-side, not on the screen.</p>
+      </section>
+
+      <section id="use">
+        <h2>Use this template</h2>
+        <p style="color:var(--muted)">Point your AI coding agent at this repo and adapt it to your domain:</p>
+        <pre><code>Use the XanoTS template at
+https://github.com/xano-scratch/order-case-management-backend
+as the starting point for my backend. Clone it, run npm install, then
+npx xanots login and npm run xano:deploy to get a live environment that
+self-seeds. Then adapt the tables, endpoints, and roles to my domain.</code></pre>
+        <p style="color:var(--muted)">Or clone and deploy it yourself:</p>
+        <pre><code>git clone https://github.com/xano-scratch/order-case-management-backend
+cd order-case-management-backend
+npm install
+npx xanots login
+npm run xano:deploy</code></pre>
+        <p class="note">The links in the build notes point at a temporary environment that expires. The durable artifact is this repo. Anyone can re-deploy it with <code>npm run xano:deploy</code> for fresh links, and it self-seeds so the demo is browsable right away (sign in with <code>ops@demo.test</code> / <code>demo1234</code>).</p>
+      </section>
+
+      <footer>
+        Built with <a href="https://www.npmjs.com/package/@xanots/sdk">@xanots/sdk</a>. A scratch proof artifact, not a production customer reference.
+      </footer>
+    </div>
+  </body>
+</html>

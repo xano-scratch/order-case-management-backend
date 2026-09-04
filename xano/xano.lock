@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "objects": {
+    "app:auth": {
+      "guid": "4fe67f5a2d319eaaca7996700f27edd8",
+      "canonical": "auth",
+      "canonical_source": "code"
+    },
+    "app:orders": {
+      "guid": "bd783a07b5a91b6f2f07e038f4246854",
+      "canonical": "orders",
+      "canonical_source": "code"
+    },
+    "app:seed": {
+      "guid": "7110fabc369b25f0581044e47d499906",
+      "canonical": "seed",
+      "canonical_source": "code"
+    },
+    "dbo:allocations": {
+      "guid": "9e4fa3c8889fea3faa8174ff4a7ca326"
+    },
+    "dbo:customers": {
+      "guid": "e7b073506cc02642649907152fe5bedf"
+    },
+    "dbo:inventory": {
+      "guid": "66a204a40a96d5d41abd759f39c27b6c"
+    },
+    "dbo:line_items": {
+      "guid": "88ee6ed9b73effebec9d292d21ec1a30"
+    },
+    "dbo:order_events": {
+      "guid": "944c1b17eeffa2b9d78567c8e56eec05"
+    },
+    "dbo:orders": {
+      "guid": "a56803538ed253f160c1c9d085d8c312"
+    },
+    "dbo:users": {
+      "guid": "157d4a98d979cf04b9ccdb98dfc15229"
+    },
+    "query:auth|POST|login": {
+      "guid": "d39d74f907baeb484e9c93358362998a"
+    },
+    "query:orders|GET|get/{order_id}": {
+      "guid": "09f1206fb02dfcadf33c0b2bfa04fb2d"
+    },
+    "query:orders|GET|list": {
+      "guid": "34e23340452b60a07a32828237f914d9"
+    },
+    "query:orders|POST|allocate": {
+      "guid": "e15f14881fc6e734895350a58556d940"
+    },
+    "query:orders|POST|cancel": {
+      "guid": "b852857877616fc9c245646a30ea18b3"
+    },
+    "query:orders|POST|create": {
+      "guid": "3130944e942445787aae63b0efb52221"
+    },
+    "query:orders|POST|exception": {
+      "guid": "985ec18460b2161f19ef167bafb97058"
+    },
+    "query:orders|POST|fulfill": {
+      "guid": "66e45c529e1fa4cf577e1540b8fe1513"
+    },
+    "query:orders|POST|resolve": {
+      "guid": "de8ea07c47705359292f9df200aa9cdf"
+    },
+    "query:orders|POST|validate": {
+      "guid": "0b2aafcc23b5fceaf6b7d53a918189c5"
+    },
+    "query:seed|POST|run": {
+      "guid": "648d04bea4597ffab24de8eee9eb3bd2"
+    }
+  }
+}
