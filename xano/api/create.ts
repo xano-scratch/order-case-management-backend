@@ -52,7 +52,7 @@ export const createOrderQuery = query({
       ],
     }),
     // A stable, unique human reference.
-    s.security.create_guid({ as: "guid" }),
+    s.security.create_uuid({ as: "guid" }),
     s.set_var("ref_suffix", withFilters(ref("guid"), fl.upper(), fl.substr(0, 6))),
     s.set_var("reference", withFilters(c.text("ORD-"), fl.concat(ref("ref_suffix")))),
     // Create the order, attach the lines, open the audit trail.
